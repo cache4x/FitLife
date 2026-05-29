@@ -1,0 +1,48 @@
+name: musclehelper_flutter
+description: MuscleHelper — App de treino e dieta com Flutter + Material Design.
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Banco de dados local
+  sqflite: ^2.3.3+1
+  path: ^1.9.0
+
+  # Áudio / Sons nativos
+  audioplayers: ^6.1.0
+
+  # Hash de senha
+  crypto: ^3.0.3
+
+  # UUID para IDs
+  uuid: ^4.5.1
+
+  # Gráficos (Progressão de Carga)
+  fl_chart: ^0.69.0
+
+  # Formatação de datas
+  intl: ^0.19.0
+
+  # Persistência de sessão (userId logado)
+  shared_preferences: ^2.3.2
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/sounds/
