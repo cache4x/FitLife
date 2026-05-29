@@ -1,0 +1,22 @@
+@if (TempData["Success"] != null || TempData["Error"] != null)
+{
+    <div style="position:fixed;top:20px;right:20px;z-index:9999;min-width:280px;max-width:400px;">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success d-flex align-items-center gap-2 shadow"
+                 style="background:#1f3a26;border:1px solid #52d27a;color:#52d27a;border-radius:10px;">
+                <span style="font-size:18px;">✓</span>
+                <span>@TempData["Success"]</span>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger d-flex align-items-center gap-2 shadow"
+                 style="background:#3a1f1f;border:1px solid #f56565;color:#f56565;border-radius:10px;">
+                <span style="font-size:18px;">✕</span>
+                <span>@TempData["Error"]</span>
+            </div>
+        }
+    </div>
+    <script>setTimeout(() => document.querySelectorAll('.alert').forEach(a => a.style.opacity = '0'), 3000);</script>
+}

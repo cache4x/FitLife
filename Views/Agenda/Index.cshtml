@@ -1,0 +1,153 @@
+@model List<Agendamento>
+@{
+    var userName = Context.Session.GetString("UserName");
+    var today = DateTime.Today;
+    var grouped = Model.GroupBy(a => a.Date.Date).OrderBy(g => g.Key).ToList();
+}
+<html>
+<head>
+    <title>Agenda - MuscleHelper</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <style>
+        body { background-color: #0e1116; color: #f1f1f1; font-family: 'Inter', -apple-system, sans-serif; }
+        .navbar-mw { background-color: #181b21; border-bottom: 2px solid #F5D10D; padding: 18px 32px; }
+        .logo { color: #F5D10D; font-weight: 900; font-size: 24px; letter-spacing: 2px; text-decoration: none; }
+        .navbar-mw a { color: #ddd; text-decoration: none; margin-left: 24px; font-weight: 600; }
+        .navbar-mw a:hover { color: #F5D10D; }
+        .page-title { font-weight: 800; font-size: 32px; margin: 30px 0 8px; }
+        .page-title span { color: #F5D10D; }
+        .date-header { font-weight: 700; font-size: 15px; color: #F5D10D; text-transform: uppercase; letter-spacing: 2px; border-left: 4px solid #F5D10D; padding-left: 12px; margin: 28px 0 12px; }
+        .date-header.today { color: #52d27a; border-color: #52d27a; }
+        .date-header.past { color: #6c7280; border-color: #6c7280; }
+        .sched-card { background-color: #1c2027; border: 1px solid #2a2f38; border-radius: 10px; padding: 14px 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; transition: all .2s; }
+        .sched-card:hover { border-color: #F5D10D; }
+        .sched-card.completed { opacity: .5; }
+        .sched-title { font-weight: 700; font-size: 16px; }
+        .sched-sub { color: #9aa0a6; font-size: 13px; margin-top: 2px; }
+        .badge-treino  { background:#23304a; color:#7cb1ff; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+        .badge-refeicao { background:#1f3a3a; color:#4dd9d9; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+        .badge-done  { background:#1f3a26; color:#52d27a; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+        .time-badge { color: #F5D10D; font-weight: 700; font-size: 13px; min-width: 48px; }
+        .btn-mw { background-color: #F5D10D; color: #0e1116; font-weight: 700; border: none; }
+        .btn-mw:hover { background-color: #ffe14a; color: #0e1116; }
+        .btn-outline-mw { background: transparent; color: #F5D10D; border: 1px solid #F5D10D; font-weight: 700; }
+        .btn-outline-mw:hover { background-color: #F5D10D; color: #0e1116; }
+        .empty-state { text-align: center; padding: 80px 20px; color: #6c7280; }
+        .empty-state h3 { color: #F5D10D; }
+        .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filter-btn { background: #1c2027; border: 1px solid #2a2f38; color: #aaa; border-radius: 20px; padding: 4px 16px; font-size: 13px; cursor: pointer; font-weight: 600; }
+        .filter-btn.active, .filter-btn:hover { background: #F5D10D; border-color: #F5D10D; color: #0e1116; }
+    </style>
+</head>
+<body>
+    <div class="navbar-mw d-flex justify-content-between align-items-center">
+        <a class="logo" href="/">💪 MUSCLEHELPER</a>
+        <div>
+            <a href="/">Início</a>
+            <a href="/exercicio/index">Exercícios</a>
+            <a href="/treino/index">Treino</a>
+            <a href="/dieta/index">Dieta</a>
+            <a href="/agenda/index">Agenda</a>
+            <span style="color:#F5D10D; margin-left:24px; font-weight:600;">@userName</span>
+            <a href="/autenticacao/sair" style="margin-left:12px;">Sair</a>
+        </div>
+    </div>
+
+    @await Html.PartialAsync("_Toast")
+    <div class="container my-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <div class="page-title">Minha <span>Agenda</span></div>
+                <p class="text-muted">@Model.Count agendamento(s) no total</p>
+            </div>
+            <a href="/agenda/criar" class="btn btn-mw">+ Novo Agendamento</a>
+        </div>
+
+        <div class="filter-bar" id="filterBar">
+            <button class="filter-btn active" onclick="filterBy('todos', this)">Todos</button>
+            <button class="filter-btn" onclick="filterBy('pendentes', this)">Pendentes</button>
+            <button class="filter-btn" onclick="filterBy('concluidos', this)">Concluídos</button>
+            <button class="filter-btn" onclick="filterBy('Treino', this)">Treino</button>
+            <button class="filter-btn" onclick="filterBy('Refeicao', this)">Refeição</button>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="empty-state">
+                <h3>Nenhum agendamento</h3>
+                <p>Agende treinos e refeições para organizar sua rotina.</p>
+                <a href="/agenda/criar" class="btn btn-mw">+ Criar Agendamento</a>
+            </div>
+        }
+        else
+        {
+            foreach (var group in grouped)
+            {
+                var dateClass = group.Key == today ? "today" : (group.Key < today ? "past" : "");
+                var dateLabel = group.Key == today
+                    ? "Hoje — " + group.Key.ToString("dd/MM/yyyy")
+                    : (group.Key == today.AddDays(1)
+                        ? "Amanhã — " + group.Key.ToString("dd/MM/yyyy")
+                        : group.Key.ToString("dddd, dd/MM/yyyy"));
+
+                <div class="date-header @dateClass">@dateLabel</div>
+
+                foreach (var item in group.OrderBy(a => a.Date))
+                {
+                    var cardClass = item.Completed ? "sched-card completed" : "sched-card";
+                    var badgeClass = item.Type == "Treino" ? "badge-treino" : "badge-refeicao";
+                    var badgeLabel = item.Type == "Treino" ? "Treino" : "Refeição";
+                    <div class="@cardClass" data-type="@item.Type" data-done="@item.Completed.ToString().ToLower()">
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="time-badge">@item.Date.ToString("HH:mm")</span>
+                            <div>
+                                <div class="sched-title">@item.Title</div>
+                                <div class="sched-sub">
+                                    <span class="@badgeClass">@badgeLabel</span>
+                                    @if (item.WorkoutSession != null)
+                                    {
+                                        <span class="ms-2">@item.WorkoutSession.Name</span>
+                                    }
+                                    @if (item.Meal != null)
+                                    {
+                                        <span class="ms-2">@item.Meal.Name</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if (item.Completed)
+                            {
+                                <span class="badge-done">✓ Concluído</span>
+                            }
+                            else
+                            {
+                                <a href="/agenda/concluir/@item.Id" class="btn btn-sm btn-outline-mw">✓ Concluir</a>
+                            }
+                            <a href="/agenda/excluir/@item.Id" class="btn btn-sm btn-danger"
+                               onclick="return confirm('Excluir @item.Title?')">Excluir</a>
+                        </div>
+                    </div>
+                }
+            }
+        }
+    </div>
+
+    <script>
+        function filterBy(filter, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.sched-card').forEach(card => {
+                const type = card.dataset.type;
+                const done = card.dataset.done === 'true';
+                let show = true;
+                if (filter === 'pendentes') show = !done;
+                else if (filter === 'concluidos') show = done;
+                else if (filter === 'Treino') show = type === 'Treino';
+                else if (filter === 'Refeicao') show = type === 'Refeicao';
+                card.style.display = show ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>

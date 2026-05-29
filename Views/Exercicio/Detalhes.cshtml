@@ -1,0 +1,226 @@
+@model Exercicio
+
+<html>
+<head>
+    <title>@Model.Name - MuscleHelper</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #0e1116;
+            color: #f1f1f1;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .navbar-mw {
+            background-color: #181b21;
+            border-bottom: 2px solid #F5D10D;
+            padding: 18px 32px;
+        }
+        .logo {
+            color: #F5D10D;
+            font-weight: 900;
+            font-size: 24px;
+            letter-spacing: 2px;
+            text-decoration: none;
+        }
+        .navbar-mw a {
+            color: #ddd;
+            text-decoration: none;
+            margin-left: 24px;
+            font-weight: 600;
+        }
+        .navbar-mw a:hover { color: #F5D10D; }
+        .breadcrumb-mw {
+            color: #6c7280;
+            margin: 24px 0 12px;
+        }
+        .breadcrumb-mw a {
+            color: #F5D10D;
+            text-decoration: none;
+        }
+        h1.ex-title {
+            font-weight: 800;
+            font-size: 36px;
+        }
+        h1.ex-title span { color: #F5D10D; }
+        .pill {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-right: 6px;
+        }
+        .pill-beginner    { background:#1f3a26; color:#52d27a; }
+        .pill-intermediate{ background:#3a361f; color:#f5d10d; }
+        .pill-advanced    { background:#3a1f1f; color:#f56565; }
+        .pill-equipment   { background:#23304a; color:#7cb1ff; }
+        .pill-muscle      { background:#2a2f38; color:#fff; }
+        .ex-thumb {
+            background-color: #1c2027;
+            border: 1px solid #2a2f38;
+            border-radius: 12px;
+            height: 380px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 140px;
+            color: #2a2f38;
+            overflow: hidden;
+        }
+        .ex-thumb img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: cover;
+        }
+        .panel {
+            background-color: #1c2027;
+            border: 1px solid #2a2f38;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 18px;
+        }
+        .panel h3 {
+            color: #F5D10D;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 16px;
+            font-weight: 700;
+            border-bottom: 1px solid #2a2f38;
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+        }
+        ol.steps li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        ol.steps li::marker {
+            color: #F5D10D;
+            font-weight: 700;
+        }
+        .btn-mw {
+            background-color: #F5D10D;
+            color: #0e1116;
+            font-weight: 700;
+            border: none;
+        }
+        .btn-mw:hover { background-color: #ffe14a; color: #0e1116; }
+        .btn-outline-mw {
+            background: transparent;
+            color: #F5D10D;
+            border: 1px solid #F5D10D;
+            font-weight: 700;
+        }
+        .btn-outline-mw:hover { background-color: #F5D10D; color: #0e1116; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar-mw d-flex justify-content-between align-items-center">
+        <a class="logo" href="/">💪 MUSCLEHELPER</a>
+        <div>
+            <a href="/">Início</a>
+            <a href="/exercicio/index">Exercícios</a>
+            <a href="/exercicio/criar">Adicionar</a>
+            @if (Context.Session.GetString("UserId") != null)
+            {
+                <span style="color:#F5D10D; margin-left:24px; font-weight:600;">@Context.Session.GetString("UserName")</span>
+                <a href="/autenticacao/sair" style="margin-left:12px;">Sair</a>
+            }
+        </div>
+    </div>
+
+    <div class="container my-4">
+
+        <div class="breadcrumb-mw">
+            <a href="/">Início</a> &raquo;
+            <a href="/exercicio/index">Exercícios</a> &raquo;
+            @if (Model.MuscleGroup != null)
+            {
+                <a href="/exercicio/index?muscle=@Model.MuscleGroupId">@Model.MuscleGroup.Name</a><text> &raquo; </text>
+            }
+            <span style="color:#fff;">@Model.Name</span>
+        </div>
+
+        <h1 class="ex-title">@Model.Name</h1>
+
+        <div class="mb-3">
+            @if (Model.MuscleGroup != null)
+            {
+                <span class="pill pill-muscle">@Model.MuscleGroup.Name</span>
+            }
+            @if (!string.IsNullOrEmpty(Model.Difficulty))
+            {
+                var cls = Model.Difficulty switch
+                {
+                    "Iniciante" => "pill pill-beginner",
+                    "Intermediário" => "pill pill-intermediate",
+                    "Avançado" => "pill pill-advanced",
+                    _ => "pill pill-muscle"
+                };
+                <span class="@cls">@Model.Difficulty</span>
+            }
+            @if (!string.IsNullOrEmpty(Model.Equipment))
+            {
+                <span class="pill pill-equipment">@Model.Equipment</span>
+            }
+        </div>
+
+        <div class="row">
+            <div class="col-md-7">
+                <div class="ex-thumb">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="@Model.Name"/>
+                    }
+                    else
+                    {
+                        <span>🏋️</span>
+                    }
+                </div>
+
+                <div class="panel">
+                    <h3>Sobre o Exercício</h3>
+                    <p>@Model.Description</p>
+                </div>
+            </div>
+
+            <div class="col-md-5">
+                <div class="panel">
+                    <h3>Como Executar</h3>
+                    @if (!string.IsNullOrEmpty(Model.Steps))
+                    {
+                        <ol class="steps">
+                            @foreach (var step in Model.Steps.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+                            {
+                                <li>@step.Trim()</li>
+                            }
+                        </ol>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Sem instruções cadastradas.</p>
+                    }
+                </div>
+
+                <div class="panel">
+                    <h3>Ações</h3>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a class="btn btn-mw flex-fill" href="/progressao/adicionar?exerciseId=@Model.Id">+ Registrar Carga</a>
+                        <a class="btn btn-outline-mw flex-fill" href="/progressao/index?exerciseId=@Model.Id">Ver Progressão</a>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <a class="btn btn-outline-mw flex-fill" href="/exercicio/editar/@Model.Id">Editar</a>
+                        <a class="btn btn-danger flex-fill" href="/exercicio/excluir/@Model.Id">Apagar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="/exercicio/index" class="btn btn-mw mt-3">&laquo; Voltar para a lista</a>
+
+    </div>
+
+</body>
+</html>

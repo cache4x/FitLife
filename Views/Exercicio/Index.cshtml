@@ -1,0 +1,282 @@
+@model List<Exercicio>
+
+<html>
+<head>
+    <title>MuscleHelper - Exercícios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #0e1116;
+            color: #f1f1f1;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .navbar-mw {
+            background-color: #181b21;
+            border-bottom: 2px solid #F5D10D;
+            padding: 18px 32px;
+        }
+        .logo {
+            color: #F5D10D;
+            font-weight: 900;
+            font-size: 24px;
+            letter-spacing: 2px;
+            text-decoration: none;
+        }
+        .navbar-mw a {
+            color: #ddd;
+            text-decoration: none;
+            margin-left: 24px;
+            font-weight: 600;
+        }
+        .navbar-mw a:hover { color: #F5D10D; }
+        .page-title {
+            font-weight: 800;
+            font-size: 32px;
+            margin: 30px 0 8px;
+        }
+        .page-title span { color: #F5D10D; }
+        .filter-bar {
+            background-color: #1c2027;
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin: 20px 0 30px;
+        }
+        .filter-bar label {
+            color: #F5D10D;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+        .filter-bar select, .filter-bar input {
+            background-color: #0e1116;
+            color: #fff;
+            border: 1px solid #2a2f38;
+            border-radius: 8px;
+            padding: 8px 12px;
+        }
+        .pill {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .pill-beginner    { background:#1f3a26; color:#52d27a; }
+        .pill-intermediate{ background:#3a361f; color:#f5d10d; }
+        .pill-advanced    { background:#3a1f1f; color:#f56565; }
+        .pill-equipment   { background:#23304a; color:#7cb1ff; }
+        .pill-muscle      { background:#2a2f38; color:#fff; }
+        .ex-card {
+            background-color: #1c2027;
+            border: 1px solid #2a2f38;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all .2s ease;
+            margin-bottom: 24px;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .ex-card:hover {
+            border-color: #F5D10D;
+            transform: translateY(-3px);
+            color: inherit;
+        }
+        .ex-thumb {
+            background-color: #0e1116;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            color: #2a2f38;
+            border-bottom: 1px solid #2a2f38;
+        }
+        .ex-thumb img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: cover;
+        }
+        .ex-body { padding: 18px; }
+        .ex-name { font-weight: 700; font-size: 18px; margin-bottom: 8px; }
+        .btn-mw {
+            background-color: #F5D10D;
+            color: #0e1116;
+            font-weight: 700;
+            border: none;
+        }
+        .btn-mw:hover { background-color: #ffe14a; color: #0e1116; }
+        .btn-outline-mw {
+            background: transparent;
+            color: #F5D10D;
+            border: 1px solid #F5D10D;
+            font-weight: 700;
+        }
+        .btn-outline-mw:hover { background-color: #F5D10D; color: #0e1116; }
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #6c7280;
+        }
+        .empty-state h3 { color: #F5D10D; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar-mw d-flex justify-content-between align-items-center">
+        <a class="logo" href="/">💪 MUSCLEHELPER</a>
+        <div>
+            <a href="/">Início</a>
+            <a href="/exercicio/index">Exercícios</a>
+            <a href="/exercicio/criar">Adicionar</a>
+            @if (Context.Session.GetString("UserId") != null)
+            {
+                <span style="color:#F5D10D; margin-left:24px; font-weight:600;">@Context.Session.GetString("UserName")</span>
+                <a href="/autenticacao/sair" style="margin-left:12px;">Sair</a>
+            }
+        </div>
+    </div>
+
+    <div class="container my-4">
+
+        <div class="page-title">
+            Biblioteca de <span>Exercícios</span>
+        </div>
+        <p class="text-muted">@Model.Count() exercícios encontrados</p>
+
+        <form class="filter-bar" method="GET" action="/exercicio/index">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label>Músculo</label>
+                    <select name="muscle" class="form-select">
+                        <option value="">Todos</option>
+                        @foreach (GrupoMuscular m in (List<GrupoMuscular>)ViewBag.MuscleGroups)
+                        {
+                            if ((string?)ViewBag.Muscle == m.Id)
+                            {
+                                <option value="@m.Id" selected>@m.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@m.Id">@m.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label>Dificuldade</label>
+                    <select name="difficulty" class="form-select">
+                        <option value="">Todas</option>
+                        @{
+                            var diffs = new[] { "Iniciante", "Intermediário", "Avançado" };
+                            foreach (var d in diffs)
+                            {
+                                if ((string?)ViewBag.Difficulty == d)
+                                {
+                                    <option value="@d" selected>@d</option>
+                                }
+                                else
+                                {
+                                    <option value="@d">@d</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label>Equipamento</label>
+                    <select name="equipment" class="form-select">
+                        <option value="">Todos</option>
+                        @{
+                            var eqs = new[] { "Peso Corporal", "Halteres", "Barra", "Cabos", "Máquina", "Kettlebell" };
+                            foreach (var e in eqs)
+                            {
+                                if ((string?)ViewBag.Equipment == e)
+                                {
+                                    <option value="@e" selected>@e</option>
+                                }
+                                else
+                                {
+                                    <option value="@e">@e</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-mw w-100">Filtrar</button>
+                </div>
+            </div>
+        </form>
+
+        @if (Model.Count == 0)
+        {
+            <div class="empty-state">
+                <h3>Nenhum exercício encontrado</h3>
+                <p>Cadastre o primeiro exercício para esse filtro.</p>
+                <a href="/exercicio/criar" class="btn btn-mw">+ Adicionar exercício</a>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                @foreach (Exercicio item in Model)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="ex-card">
+                            <a href="/exercicio/detalhes/@item.Id" style="text-decoration:none; color:inherit;">
+                                <div class="ex-thumb">
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="@item.ImageUrl" alt="@item.Name"/>
+                                    }
+                                    else
+                                    {
+                                        <span>🏋️</span>
+                                    }
+                                </div>
+                                <div class="ex-body">
+                                    <div class="ex-name">@item.Name</div>
+                                    <div class="mb-2">
+                                        @if (item.MuscleGroup != null)
+                                        {
+                                            <span class="pill pill-muscle">@item.MuscleGroup.Name</span>
+                                        }
+                                        @if (!string.IsNullOrEmpty(item.Difficulty))
+                                        {
+                                            var cls = item.Difficulty switch
+                                            {
+                                                "Iniciante" => "pill pill-beginner",
+                                                "Intermediário" => "pill pill-intermediate",
+                                                "Avançado" => "pill pill-advanced",
+                                                _ => "pill pill-muscle"
+                                            };
+                                            <span class="@cls">@item.Difficulty</span>
+                                        }
+                                        @if (!string.IsNullOrEmpty(item.Equipment))
+                                        {
+                                            <span class="pill pill-equipment">@item.Equipment</span>
+                                        }
+                                    </div>
+                                </div>
+                            </a>
+                            <div class="px-3 pb-3 d-flex gap-2">
+                                <a class="btn btn-sm btn-outline-mw flex-fill" href="/exercicio/editar/@item.Id">Editar</a>
+                                <a class="btn btn-sm btn-danger flex-fill" href="/exercicio/excluir/@item.Id">Apagar</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+    </div>
+
+</body>
+</html>

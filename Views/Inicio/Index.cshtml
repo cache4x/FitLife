@@ -1,0 +1,177 @@
+@model PainelViewModel
+<html>
+<head>
+    <title>Dashboard - MuscleHelper</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <style>
+        body { background-color: #0e1116; color: #f1f1f1; font-family: 'Inter', -apple-system, sans-serif; }
+        .navbar-mw { background-color: #181b21; border-bottom: 2px solid #F5D10D; padding: 18px 32px; }
+        .logo { color: #F5D10D; font-weight: 900; font-size: 24px; letter-spacing: 2px; text-decoration: none; }
+        .navbar-mw a { color: #ddd; text-decoration: none; margin-left: 24px; font-weight: 600; }
+        .navbar-mw a:hover { color: #F5D10D; }
+        .greeting { font-weight: 800; font-size: 30px; margin: 32px 0 4px; }
+        .greeting span { color: #F5D10D; }
+        .section-title { color: #F5D10D; text-transform: uppercase; letter-spacing: 3px; font-weight: 700; border-left: 4px solid #F5D10D; padding-left: 12px; margin: 32px 0 16px; font-size: 13px; }
+        .stat-card { background-color: #1c2027; border: 1px solid #2a2f38; border-radius: 12px; padding: 20px 24px; height: 100%; }
+        .stat-val { font-size: 36px; font-weight: 800; color: #F5D10D; line-height: 1; }
+        .stat-label { color: #9aa0a6; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; }
+        .stat-sub { color: #6c7280; font-size: 12px; margin-top: 4px; }
+        .quick-link { background-color: #1c2027; border: 1px solid #2a2f38; border-radius: 12px; padding: 20px; text-decoration: none; color: #f1f1f1; display: block; transition: all .2s; text-align: center; }
+        .quick-link:hover { border-color: #F5D10D; color: #F5D10D; transform: translateY(-2px); }
+        .quick-link .icon { font-size: 32px; }
+        .quick-link .label { font-weight: 700; font-size: 14px; margin-top: 6px; text-transform: uppercase; letter-spacing: 1px; }
+        .sched-item { background-color: #1c2027; border: 1px solid #2a2f38; border-radius: 10px; padding: 12px 16px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .sched-item:hover { border-color: #F5D10D; }
+        .badge-treino  { background:#23304a; color:#7cb1ff; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+        .badge-refeicao { background:#1f3a3a; color:#4dd9d9; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+        .muscle-card { background-color: #1c2027; border: 1px solid #2a2f38; border-radius: 12px; padding: 18px; text-align: center; cursor: pointer; transition: all .2s; text-decoration: none; color: #fff; display: block; }
+        .muscle-card:hover { border-color: #F5D10D; color: #F5D10D; transform: translateY(-2px); }
+        .muscle-emoji { font-size: 36px; }
+        .muscle-name { font-weight: 700; font-size: 13px; text-transform: uppercase; margin-top: 4px; }
+        .btn-mw { background-color: #F5D10D; color: #0e1116; font-weight: 700; border: none; }
+        .btn-mw:hover { background-color: #ffe14a; color: #0e1116; }
+        .last-load { background-color: #1c2027; border: 1px solid #2a2f38; border-radius: 12px; padding: 20px 24px; }
+        .region-title { color: #9aa0a6; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; margin: 16px 0 8px; }
+    </style>
+</head>
+<body>
+    <div class="navbar-mw d-flex justify-content-between align-items-center">
+        <a class="logo" href="/">💪 MUSCLEHELPER</a>
+        <div>
+            <a href="/exercicio/index">Exercícios</a>
+            <a href="/treino/index">Treino</a>
+            <a href="/dieta/index">Dieta</a>
+            <a href="/agenda/index">Agenda</a>
+            <span style="color:#F5D10D; margin-left:24px; font-weight:600;">@Model.UserName</span>
+            <a href="/autenticacao/sair" style="margin-left:12px;">Sair</a>
+        </div>
+    </div>
+
+    @await Html.PartialAsync("_Toast")
+
+    <div class="container my-4">
+        <div class="greeting">Olá, <span>@Model.UserName</span> 👋</div>
+        <p class="text-muted">Aqui está seu resumo de hoje</p>
+
+        <div class="section-title">Resumo da Semana</div>
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-val">@Model.WorkoutsThisWeek</div>
+                    <div class="stat-label">Treinos agendados</div>
+                    <div class="stat-sub">nesta semana</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-val">@Model.TodayCalories</div>
+                    <div class="stat-label">kcal agendadas</div>
+                    <div class="stat-sub">hoje</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-val">@Model.TotalWorkoutPlans</div>
+                    <div class="stat-label">Planos de treino</div>
+                    <div class="stat-sub">cadastrados</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-val">@Model.TotalDietPlans</div>
+                    <div class="stat-label">Planos alimentares</div>
+                    <div class="stat-sub">cadastrados</div>
+                </div>
+            </div>
+        </div>
+
+        @if (Model.LastLoadRecord != null)
+        {
+            <div class="section-title">Último Registro de Carga</div>
+            <div class="last-load d-flex justify-content-between align-items-center">
+                <div>
+                    <div style="font-weight:700;font-size:17px;">@Model.LastLoadRecord.Exercise?.Name</div>
+                    <div style="color:#9aa0a6;font-size:13px;">
+                        @Model.LastLoadRecord.Date.ToLocalTime().ToString("dd/MM/yyyy") &bull;
+                        @Model.LastLoadRecord.Sets séries × @Model.LastLoadRecord.Reps reps
+                    </div>
+                </div>
+                <div>
+                    <span style="font-size:28px;font-weight:800;color:#F5D10D;">@Model.LastLoadRecord.Load kg</span>
+                    <a href="/progressao/index?exerciseId=@Model.LastLoadRecord.ExerciseId" class="btn btn-sm btn-mw ms-3">Ver Progressão</a>
+                </div>
+            </div>
+        }
+
+        <div class="row g-3 mt-1">
+            <div class="col-md-6">
+                <div class="section-title">Próximos Agendamentos</div>
+                @if (!Model.Upcoming.Any())
+                {
+                    <div style="background-color:#1c2027;border:1px dashed #2a2f38;border-radius:12px;padding:28px 20px;text-align:center;">
+                        <div style="font-size:32px;margin-bottom:8px;">📅</div>
+                        <div style="color:#9aa0a6;font-size:14px;margin-bottom:16px;">Nenhum agendamento futuro.</div>
+                        <a href="/agenda/criar" class="btn btn-mw px-4">+ Criar Agendamento</a>
+                    </div>
+                }
+                else
+                {
+                    foreach (var item in Model.Upcoming)
+                    {
+                        var badge = item.Type == "Treino" ? "badge-treino" : "badge-refeicao";
+                        var label = item.Type == "Treino" ? "Treino" : "Refeição";
+                        <div class="sched-item">
+                            <div>
+                                <span class="@badge">@label</span>
+                                <span class="ms-2" style="font-weight:600;">@item.Title</span>
+                                <div style="color:#6c7280;font-size:12px;margin-top:2px;">@item.Date.ToLocalTime().ToString("dd/MM HH:mm")</div>
+                            </div>
+                            <a href="/agenda/concluir/@item.Id" class="btn btn-sm btn-mw">✓</a>
+                        </div>
+                    }
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <a href="/agenda/index" style="color:#F5D10D;font-size:13px;">Ver todos →</a>
+                        <a href="/agenda/criar" class="btn btn-sm btn-mw">+ Novo</a>
+                    </div>
+                }
+            </div>
+
+            <div class="col-md-6">
+                <div class="section-title">Acesso Rápido</div>
+                <div class="row g-2">
+                    <div class="col-6"><a class="quick-link" href="/treino/criar"><div class="icon">🏋️</div><div class="label">Novo Treino</div></a></div>
+                    <div class="col-6"><a class="quick-link" href="/dieta/criar"><div class="icon">🥗</div><div class="label">Nova Dieta</div></a></div>
+                    <div class="col-6"><a class="quick-link" href="/agenda/criar"><div class="icon">📅</div><div class="label">Agendar</div></a></div>
+                    <div class="col-6"><a class="quick-link" href="/exercicio/index"><div class="icon">💪</div><div class="label">Exercícios</div></a></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">Grupos Musculares</div>
+        <div class="region-title">Frente</div>
+        <div class="row g-2">
+            @foreach (var m in Model.MuscleGroups.Where(x => x.Region == "Frente"))
+            {
+                <div class="col-4 col-md-2">
+                    <a class="muscle-card" href="/exercicio/index?muscle=@m.Id">
+                        <div class="muscle-emoji">@m.IconEmoji</div>
+                        <div class="muscle-name">@m.Name</div>
+                    </a>
+                </div>
+            }
+        </div>
+        <div class="region-title">Costas</div>
+        <div class="row g-2">
+            @foreach (var m in Model.MuscleGroups.Where(x => x.Region == "Costas"))
+            {
+                <div class="col-4 col-md-2">
+                    <a class="muscle-card" href="/exercicio/index?muscle=@m.Id">
+                        <div class="muscle-emoji">@m.IconEmoji</div>
+                        <div class="muscle-name">@m.Name</div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</body>
+</html>

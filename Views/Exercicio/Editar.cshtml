@@ -1,0 +1,193 @@
+@model Exercicio
+@{
+    var muscles = (List<GrupoMuscular>)ViewBag.MuscleGroups;
+}
+
+<html>
+<head>
+    <title>Editar @Model.Name - MuscleHelper</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #0e1116;
+            color: #f1f1f1;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .navbar-mw {
+            background-color: #181b21;
+            border-bottom: 2px solid #F5D10D;
+            padding: 18px 32px;
+        }
+        .logo {
+            color: #F5D10D;
+            font-weight: 900;
+            font-size: 24px;
+            letter-spacing: 2px;
+            text-decoration: none;
+        }
+        .navbar-mw a {
+            color: #ddd;
+            text-decoration: none;
+            margin-left: 24px;
+            font-weight: 600;
+        }
+        .navbar-mw a:hover { color: #F5D10D; }
+        .form-card {
+            background-color: #1c2027;
+            border: 1px solid #2a2f38;
+            border-radius: 12px;
+            padding: 32px;
+            margin-top: 30px;
+        }
+        h1 { font-weight: 800; }
+        h1 span { color: #F5D10D; }
+        label {
+            color: #F5D10D;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        .form-control, .form-select {
+            background-color: #0e1116;
+            color: #fff;
+            border: 1px solid #2a2f38;
+            border-radius: 8px;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #0e1116;
+            color: #fff;
+            border-color: #F5D10D;
+            box-shadow: 0 0 0 .15rem rgba(245, 209, 13, .25);
+        }
+        .btn-mw {
+            background-color: #F5D10D;
+            color: #0e1116;
+            font-weight: 700;
+            border: none;
+        }
+        .btn-mw:hover { background-color: #ffe14a; color: #0e1116; }
+        .btn-outline-mw {
+            background: transparent;
+            color: #F5D10D;
+            border: 1px solid #F5D10D;
+            font-weight: 700;
+        }
+        .btn-outline-mw:hover { background-color: #F5D10D; color: #0e1116; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar-mw d-flex justify-content-between align-items-center">
+        <a class="logo" href="/">💪 MUSCLEHELPER</a>
+        <div>
+            <a href="/">Início</a>
+            <a href="/exercicio/index">Exercícios</a>
+            <a href="/exercicio/criar">Adicionar</a>
+            @if (Context.Session.GetString("UserId") != null)
+            {
+                <span style="color:#F5D10D; margin-left:24px; font-weight:600;">@Context.Session.GetString("UserName")</span>
+                <a href="/autenticacao/sair" style="margin-left:12px;">Sair</a>
+            }
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="form-card">
+            <h1>Editar <span>Exercício</span></h1>
+            <p class="text-muted">@Model.Name</p>
+
+            <form action="/exercicio/editar/@Model.Id" method="POST">
+                @Html.AntiForgeryToken()
+
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label>Nome do Exercício</label>
+                        <input class="form-control" name="Name" value="@Model.Name" required/>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Grupo Muscular</label>
+                        <select class="form-select" name="MuscleGroupId" required>
+                            @foreach (GrupoMuscular m in muscles)
+                            {
+                                if (m.Id == Model.MuscleGroupId)
+                                {
+                                    <option value="@m.Id" selected>@m.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@m.Id">@m.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Dificuldade</label>
+                        <select class="form-select" name="Difficulty">
+                            @{
+                                var diffs = new[] { "Iniciante", "Intermediário", "Avançado" };
+                                foreach (var d in diffs)
+                                {
+                                    if (Model.Difficulty == d)
+                                    {
+                                        <option value="@d" selected>@d</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@d">@d</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Equipamento</label>
+                        <select class="form-select" name="Equipment">
+                            @{
+                                var eqs = new[] { "Peso Corporal", "Halteres", "Barra", "Cabos", "Máquina", "Kettlebell" };
+                                foreach (var e in eqs)
+                                {
+                                    if (Model.Equipment == e)
+                                    {
+                                        <option value="@e" selected>@e</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@e">@e</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <label>Descrição</label>
+                        <textarea class="form-control" name="Description" rows="3">@Model.Description</textarea>
+                    </div>
+
+                    <div class="col-12">
+                        <label>Passos (um por linha)</label>
+                        <textarea class="form-control" name="Steps" rows="6">@Model.Steps</textarea>
+                    </div>
+
+                    <div class="col-12">
+                        <label>URL da Imagem</label>
+                        <input class="form-control" name="ImageUrl" value="@Model.ImageUrl"/>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-mw">Atualizar</button>
+                    <a href="/exercicio/index" class="btn btn-outline-mw">Cancelar</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
